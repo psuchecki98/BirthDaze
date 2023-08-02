@@ -11,13 +11,10 @@ metadata = MetaData(naming_convention={
 
 db = SQLAlchemy(metadata=metadata)
 
-#-----------------------------------------
-#Add Rules and Validations
-#Validations for username, email, password
-#-----------------------------------------
-
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
+
+    serialize_only = ('id', 'username', 'email', 'password_hash')
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(16), unique=True)
@@ -30,9 +27,35 @@ class User(db.Model, SerializerMixin):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
     
+    @validates('username')
+    def validate_username(self, key, username):
+        if len(username) >= 3 and len(username) <= 16:
+            return username
+        else: 
+            raise ValueError("Username must be between 3-16 characters.")
+        
+    @validates('email')
+    def validate_email(self, key, email):
+        if '@' in email:
+            if email[-4:] in ['.com', '.org', '.net']:
+                return email
+            else:
+                raise ValueError("Email must end in .com, .org, or .net")
+        else:
+            raise ValueError("Email must include @.")
+        
+    @validates('password_hash')
+    def validate_password(self, key, password_hash):
+        if len(password_hash) >= 5 and len(password_hash) <= 16:
+            return password_hash
+        else:
+            raise ValueError("Password must be between 5-16 characters.")
+        
 
 class Birthday(db.Model, SerializerMixin):
     __tablename__ = 'birthdays'
+
+    serialize_only = ('id', 'name', 'date', 'user_id', 'friend_id')
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
@@ -47,6 +70,8 @@ class Birthday(db.Model, SerializerMixin):
 class Notification(db.Model, SerializerMixin):
     __tablename__ = 'notifications'
 
+    serialize_only = ('id', 'message', 'timestamp', 'user_id')
+
     id = db.Column(db.Integer, primary_key=True)
     message = db.Column(db.String(256))
     timestamp = db.Column(db.DateTime, default= datetime.utcnow)
@@ -57,6 +82,8 @@ class Notification(db.Model, SerializerMixin):
 
 class Friend(db.Model, SerializerMixin):
     __tablename__ = 'friends'
+
+    serialize_only = ('id', 'name', 'email', 'user_id')
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
