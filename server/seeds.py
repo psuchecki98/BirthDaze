@@ -21,7 +21,7 @@ if __name__ == '__main__':
         birthdays = []
         friends = []
 
-    # Creates Users/Birthdays/Friends
+    # Creates Fake Users/Birthdays/Friends
         for _ in range(20):
             user = User(
                 username = fake.user_name(),
