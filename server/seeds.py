@@ -13,58 +13,50 @@ if __name__ == '__main__':
         Birthday.query.delete()
         Friend.query.delete()
 
+
 #Seeding Users, Birthdays, Notifications, Friends, Tags, and more
 #----------------------------------------------------------------
-    # Creates fake users
+    # Creates empty lists for users, birthdays and friends
         users = []
-        for _ in range(50):
+        birthdays = []
+        friends = []
+
+    # Creates Users/Birthdays/Friends
+        for _ in range(20):
             user = User(
                 username = fake.user_name(),
                 email = fake.email(),
                 password_hash = fake.password()
             )
-
             users.append(user)
             db.session.add(user)
+            db.session.commit()
 
-        db.session.commit()
-            
-    #Creates Birthdays for Users
-        birthdays = []
-        for user in users:
             birthday = Birthday(
-                name = fake.name(),
-                date = fake.date_object(),
+                name = fake.name(), 
+                date = fake.date_of_birth(minimum_age=1, maximum_age=99),
                 user_id = user.id
             )
             birthdays.append(birthday)
             db.session.add(birthday)
-        
-        db.session.commit()
+ 
+            for _ in range(random.randint(5, 25)):
+                friend = Friend(
+                    name = fake.name(),
+                    email = fake.email(),
+                    user_id = user.id
+                )
+                friends.append(friend)
+                db.session.add(friend)
+                db.session.commit()
 
+                friend_birthday = Birthday(
+                    name = friend.name,
+                    date = fake.date_of_birth(minimum_age=1, maximum_age=99),
+                    friend_id = friend.id
+                )
+                birthdays.append(friend_birthday)
+                db.session.add(friend_birthday)
 
+            db.session.commit()
 
-
-#Need to figure out the logic behind this a bit more before proceeding.
-#Thoughts to remember:
-#Friends are just other Users, generating random Friends does not make them Users
-#in the sense of the database. The database only generates 50 Users and 50 correlating
-#Birthdays, when you add the bode below we generate random integer of friends for a User
-#between 1, 15 but technically none of these Friends have birthdays at the moment
-#Try to think of a way to either make this work, or how to get friends to have arelationship with birthdays
-#It's breaking my head
-
-    #Creates Friends for Users
-        # friends = []
-        # rand_friend_amount = random.randint(1,15)
-        # for user in users:
-        #     for _ in range(rand_friend_amount):
-        #         friend = Friend(
-        #             name = fake.name(),
-        #             email = fake.email(),
-        #             user_id = user.id
-        #         )
-        #         friends.append(friend)
-        #         db.session.add(friend)
-            
-        # db.session.commit()

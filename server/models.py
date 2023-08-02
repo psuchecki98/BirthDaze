@@ -38,8 +38,10 @@ class Birthday(db.Model, SerializerMixin):
     name = db.Column(db.String(64))
     date = db.Column(db.Date)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    friend_id = db.Column(db.Integer, db.ForeignKey('friends.id'))
 
     user = db.relationship('User', backref='birthdays')
+    friend = db.relationship('Friend', backref='birthdays')
 
 
 class Notification(db.Model, SerializerMixin):
@@ -62,6 +64,7 @@ class Friend(db.Model, SerializerMixin):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     user = db.relationship('User', backref='friends')
+
 
 
 class Tag(db.Model, SerializerMixin):
