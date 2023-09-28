@@ -24,10 +24,9 @@ function UserHomePage() {
                     <h3 className="text-xl font-bold mb-4">
                         Upcoming Birthdays:
                     </h3>
-                    {/* This is just a placeholder. You'd typically map over an array of birthdays and display them here. */}
-                    <p className="mb-2">- John Doe: 25th July</p>
-                    <p className="mb-2">- Jane Smith: 30th July</p>
-                    <p className="mb-2">- Alice Johnson: 5th August</p>
+                    <p className="mb-2">  John Doe: 25th July</p>
+                    <p className="mb-2">  Jane Smith: 30th July</p>
+                    <p className="mb-2">  Alice Johnson: 5th August</p>
                 </div>
             </div>
         </div>

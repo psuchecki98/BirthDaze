@@ -20,13 +20,15 @@ function UserFriends() {
     })
 
     return (
-        <div className="flex flex-col h-screen bg-white">
+        <>
             <div className='border-y-2'>
                 <UserNavBar />
             </div>
-            {friendsInfo}
             
-        </div>
+            <div className="grid grid-cols-2 gap-4 h-screen bg-white pd-5 pl-[10%]">
+                {friendsInfo}
+            </div>
+        </>
         
     );
 }

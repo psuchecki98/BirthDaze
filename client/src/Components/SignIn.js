@@ -33,14 +33,13 @@ function SignIn() {
             },
             body: JSON.stringify(formData)
         });
-        
-        console.log(response)
+
         const data = await response.json();
 
         if (data.success) {
             setUser(formData.email);
             navigate('/user');
-        } 
+        }
         else {
             alert('Invalid credentials');
         }
@@ -60,7 +59,7 @@ function SignIn() {
                         Please enter your login information:
                     </h2>
                     <div className="w-full my-6">
-                        <input 
+                        <input
                             type="email"
                             className="p-2 rounded shadow w-full text-black"
                             placeholder="Enter Email"
@@ -70,7 +69,7 @@ function SignIn() {
                         />
                     </div>
                     <div className="w-full my-6">
-                        <input 
+                        <input
                             type="password"
                             className="p-2 rounded shadow w-full text-black"
                             placeholder="Enter Password"

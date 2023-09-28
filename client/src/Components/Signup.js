@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import 'tailwindcss/tailwind.css';
-
+import UserContext from '../Context/UserContext';
 import NavBar from './Navbar';
 
 function SignUp() {
-
+    const navigate = useNavigate();
+    const { setUser } = useContext(UserContext)
     const [formData, setFormData] = useState({
         username: '',
         email: '',
-        password: ''
+        password: '',
+        birthday: ''
     });
 
     const handleChange = (e) => {
@@ -18,8 +21,30 @@ function SignUp() {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        const response = await fetch('http://127.0.0.1:5555/signup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            body: JSON.stringify({
+                username: formData.username,
+                password: formData.password,
+                email: formData.email
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            setUser(formData.email);
+            navigate("/user")
+        }
+        else {
+            alert('Invalid credentials');
+        }
     };
 
     return (
@@ -36,7 +61,7 @@ function SignUp() {
                         Enter the following to create an account:
                     </h2>
                     <div className="w-full my-6">
-                        <input 
+                        <input
                             type="text"
                             className="p-2 rounded shadow w-full text-black"
                             placeholder="Username"
@@ -46,7 +71,7 @@ function SignUp() {
                         />
                     </div>
                     <div className="w-full my-6">
-                        <input 
+                        <input
                             type="email"
                             className="p-2 rounded shadow w-full text-black"
                             placeholder="Email"
@@ -56,7 +81,7 @@ function SignUp() {
                         />
                     </div>
                     <div className="w-full my-6">
-                        <input 
+                        <input
                             type="password"
                             className="p-2 rounded shadow w-full text-black"
                             placeholder="Password"
@@ -65,23 +90,33 @@ function SignUp() {
                             onChange={handleChange}
                         />
                     </div>
+                    {/* <div className="w-full my-6">
+                        <input
+                            type="text"
+                            className="p-2 rounded shadow w-full text-black"
+                            placeholder="Birthday"
+                            name="birthday"
+                            value={formData.birthday}
+                            onChange={handleChange}
+                        />
+                    </div> */}
                     <h2 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Account requirements:</h2>
                     <ul class="max-w-md space-y-1 text-gray-500 list-inside dark:text-gray-400">
                         <li class="flex items-center">
                             <svg class="w-3.5 h-3.5 mr-2 text-green-500 dark:text-green-400 flex-shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
+                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
                             </svg>
-                             Username between 5-16 characters
+                            Username between 5-16 characters
                         </li>
                         <li class="flex items-center">
                             <svg class="w-3.5 h-3.5 mr-2 text-green-500 dark:text-green-400 flex-shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
+                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
                             </svg>
                             Email must end in .com, .org, or .net
                         </li>
                         <li class="flex items-center">
                             <svg class="w-3.5 h-3.5 mr-2 text-gray-500 dark:text-gray-400 flex-shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
+                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
                             </svg>
                             Password between 5-16 characters
                         </li>

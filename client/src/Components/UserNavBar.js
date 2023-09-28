@@ -1,9 +1,12 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import {AiOutlineClose, AiOutlineMenu, AiOutlineHome} from 'react-icons/ai'
 import { NavLink, useNavigate } from 'react-router-dom';
 
+import UserContext from '../Context/UserContext';
+
 function UserNavBar(){
     const [nav, setNav] = useState(true)
+    const { setUser } = useContext(UserContext);
 
     const handleNav = () => {
         setNav(!nav)
@@ -62,6 +65,7 @@ function UserNavBar(){
                     <NavLink key={"Friends"} name={"Friends"} to={"/friends"}>
                         <li  className='p-3 font-bold border-b border-gray-300 text-blue-500'>FRIENDS</li>
                     </NavLink>
+                   <li onClick={(e) => { setUser(null); navigate("/") }} className='p-3 font-bold border-b border-gray-300 text-blue-500 cursor-pointer'>LOG OUT</li>
                 </ul>
             </div>
          </div>
