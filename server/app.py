@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_restful import Api, Resource
 from flask_cors import CORS
+from datetime import datetime
 import os
 
 from models import db, UserLogin, UserInfo
@@ -112,7 +113,7 @@ def user_login_by_id(id):
             return response
     else:
         response = make_response(
-            { "error": "User not found" },
+            { "error": "User Login not found" },
             404
         )
     return response
@@ -158,62 +159,96 @@ def usersInfo():
         )
         return response
 
+@app.route('/userinfo/<int:id>', methods = ['GET', 'PATCH', 'DELETE'])
+def user_info_by_id(id):
+    userInfo = UserInfo.query.filter(UserInfo.id == id).first()
 
+    if userInfo:
 
-    
-# @app.route('/userinfo/<int:id>', methods = ['GET', 'PATCH', 'DELETE'])
-# def user_info_by_id(id):
-#     userInfo = UserInfo.query.filter(UserInfo.id == id).first()
+        if request.method == 'GET':
+            userinfo_dict = userInfo.to_dict()
 
-#     if userInfo:
-
-#         if request.method == 'GET':
-
-#             user_info_dict = userInfo.to_dict()
-
-#             response = make_response(
-#                 jsonify(user_info_dict),
-#                 200
-#             )
-#             return response
+            response = make_response(
+                jsonify(userinfo_dict),
+                200
+            )
+            return response
         
-#         elif request.method == 'PATCH':
-#             data = request.get_json()
+        elif request.method == 'PATCH':
+            data = request.get_json()
 
-#             try:
+            try:
+                for key in data:
+                    setattr(userInfo, key, data[key])
+                
+                db.session.commit()
+                response = make_response(
+                    jsonify(userInfo.to_dict(rules = ())),
+                    202
+                )
+            except ValueError:
 
-#                 for key in data:
-#                     setattr(userInfo, key, data[key])
+                response = make_response(
+                    {"errors": ["validation errors"] },
+                    400
+                )
+        
+        elif request.method == 'DELETE':
 
-#                 db.session.commit()
+            db.session.delete(userInfo)
+            db.session.commit()
 
-#                 response = make_response(
-#                     jsonify(user_info_dict.to_dict(rules = ())),
-#                     202    
-#                 )
-#             except ValueError:
+            response = make_response(
+                jsonify({}),
+                204
+            )
+            return response
+    else:
+        response = make_response(
+            {"error": "User Info not found."},
+            404
+        )
+    return response
 
-#                 response = make_response(
-#                     { "errors": ["validation errors"] },
-#                     400
-#                 )
-#         elif request.method == 'DELETE':
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.json
+    email = data['email']
+    password = data['password']
 
-#             db.session.delete(userInfo)
-#             db.session.commit()
+    user_login = UserLogin.query.filter_by(email=email).first()
 
-#             response = make_response(
-#                 jsonify({}),
-#                 204
-#             )
-#             return response
-#     else:
+    if user_login and user_login.check_password(password):
+        return {"success": True, "message": "Logged in successfully."}
+    else:
+        return {"success": False, "message": "Invalid credentials."}, 401
 
-#         response = make_response(
-#             { "error": "User info not found." },
-#             404
-#         )
-#     return response
+@app.route('/signup', methods=['POST'])
+def signup():
+    data = request.json
+
+    username = data['username']
+    email = data['email']
+    password = data['password']
+    name = data['name']
+    birthdate = datetime.strptime(data['birthdate'], "%Y-%m-%d").date()
+
+    existing_user = UserLogin.query.filter((UserLogin.email == email) | (UserLogin.username == username)).first()
+    if existing_user:
+        return {"success": False, "message": "Username or email already in use."}, 400
+
+    # Create a new UserLogin entry
+    new_user_login = UserLogin(username=username, email=email)
+    new_user_login.set_password(password)
+    db.session.add(new_user_login)
+    db.session.flush()  # Flush to get the id of the new_user_login before committing
+
+    # Create a new UserInfo entry
+    new_user_info = UserInfo(user_login_id=new_user_login.id, name=name, birthdate=birthdate)
+    db.session.add(new_user_info)
+    db.session.commit()
+
+    return {"success": True, "message": "Account created successfully."}
 
 
 # @app.route('/users', methods = ['GET', 'POST'])
@@ -516,43 +551,6 @@ def usersInfo():
 #         )
 
 #     return response
-
-
-
-#Potential back routes for login and signup
-# @app.route('/login', methods=['POST'])
-# def login():
-#     data = request.json
-#     email = data['email']
-#     password = data['password']
-
-#     user = User.query.filter_by(email=email).first()
-
-#     if user and user.check_password(password):
-#         return {"success": True, "message": "Logged in successfully."}
-#     else:
-#         return {"success": False, "message": "Invalid credentials."}, 401
-
-# @app.route('/signup', methods=['POST'])
-# def signup():
-#     data = request.json
-
-#     username = data['username']
-#     email = data['email']
-#     password = data['password']
-#     existing_user = User.query.filter((User.email == email) | (User.username == username)).first()
-#     if existing_user:
-#         return {"success": False, "message": "Username or email already in use."}, 400
-
-#     new_user = User(username=username, email=email)
-#     new_user.set_password(password)
-#     db.session.add(new_user)
-#     db.session.commit()
-
-#     return {"success": True, "message": "Account created successfully."}
-
-
-
 
 
 if __name__ == '__main__':

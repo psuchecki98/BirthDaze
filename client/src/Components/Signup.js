@@ -11,7 +11,9 @@ function SignUp() {
         username: '',
         email: '',
         password: '',
-        birthday: ''
+        birthday: '',
+        name: '',
+        birthdate: ''
     });
 
     const handleChange = (e) => {
@@ -23,7 +25,7 @@ function SignUp() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const response = await fetch('http://127.0.0.1:5555/signup', {
+        const response = await fetch('http://127.0.0.1:5000/signup', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -32,7 +34,9 @@ function SignUp() {
             body: JSON.stringify({
                 username: formData.username,
                 password: formData.password,
-                email: formData.email
+                email: formData.email,
+                name: formData.name,
+                birthdate: formData.birthday
             })
         });
 
@@ -90,16 +94,26 @@ function SignUp() {
                             onChange={handleChange}
                         />
                     </div>
-                    {/* <div className="w-full my-6">
+                    <div className="w-full my-6">
                         <input
                             type="text"
                             className="p-2 rounded shadow w-full text-black"
-                            placeholder="Birthday"
+                            placeholder="Full Name"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                        />
+                    </div>
+                    <div className="w-full my-6">
+                        <input
+                            type="text"
+                            className="p-2 rounded shadow w-full text-black"
+                            placeholder="Birthday (YYYY-MM-DD)"
                             name="birthday"
                             value={formData.birthday}
                             onChange={handleChange}
                         />
-                    </div> */}
+                    </div>
                     <h2 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Account requirements:</h2>
                     <ul class="max-w-md space-y-1 text-gray-500 list-inside dark:text-gray-400">
                         <li class="flex items-center">
